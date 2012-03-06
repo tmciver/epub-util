@@ -16,23 +16,14 @@
        str
        Integer.))
 
-(defn directly-inferior?
+(defn subordinate-or-equal?
   "Returns true if the second entry represents a heading that is directly
-inferior to the first heading."
+subordinate or equal to the first entry."
   [h1 h2]
   (let [h1val (heading-to-val h1)
         h2val (heading-to-val h2)]
-    (and (< h1val h2val)
-         (= (- h2val h1val) 1))))
-
-(defn child-or-sibling?
-  "Returns true if the second entry is directly inferior to or a sibling of the
-  first entry."
-  [h1 h2]
-  (or (directly-inferior? h1 h2)
-      (let [h1val (heading-to-val h1)
-            h2val (heading-to-val h2)]
-        (= h1val h2val))))
+    (or (= (- h2val h1val) 1)
+        (= h2val h1val))))
 
 (defn heading-to-navpoint
   "Converts a map representing an Enlive heading tag to a map representing an

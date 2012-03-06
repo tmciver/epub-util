@@ -2,14 +2,8 @@
   (:use [epub-utils.core]
         [clojure.test]))
 
-(deftest test-directly-inferior?
-  (are [h1 h2 res] (= (directly-inferior? h1 h2) res)
-       :h1 :h2 true
-       :h2 :h1 false
-       :h1 :h3 false))
-
-(deftest test-child-or-sibling?
-  (are [h1 h2 res] (= (child-or-sibling? h1 h2) res)
+(deftest test-subordinate-or-equal?
+  (are [h1 h2 res] (= (subordinate-or-equal? h1 h2) res)
        :h1 :h2 true
        :h2 :h1 false
        :h1 :h3 false
