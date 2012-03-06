@@ -25,6 +25,15 @@ inferior to the first heading."
     (and (< h1val h2val)
          (= (- h2val h1val) 1))))
 
+(defn child-or-sibling?
+  "Returns true if the second entry is directly inferior to or a sibling of the
+  first entry."
+  [h1 h2]
+  (or (directly-inferior? h1 h2)
+      (let [h1val (heading-to-val h1)
+            h2val (heading-to-val h2)]
+        (= h1val h2val))))
+
 (defn heading-to-navpoint
   "Converts a map representing an Enlive heading tag to a map representing an
   Enlive ePUB TOC NavPoint tag."
