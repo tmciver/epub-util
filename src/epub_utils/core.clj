@@ -25,14 +25,23 @@ subordinate or equal to the first entry."
     (or (= (- h2val h1val) 1)
         (= h2val h1val))))
 
-(defn split-when-not-equal
-  "Splits the given collection at the point at which successive elements become
-  unequal. For example, [:a :a :b :c] becomes [[:a :a] [:b :c]] and [:a :b :c]
-  becomes [[:a] [:b :c]]."
-  [coll]
+(defn subordinate-heading?
+  "Returns true if the second entry represents a heading that is subordinate to
+the first entry."
+  [h1 h2]
+  (let [h1val (heading-to-val h1)
+        h2val (heading-to-val h2)]
+    (< h1val h2val)))
+
+(defn split-when
+  "Splits the given collection at the point at which pred becomes false. pred
+  must be a function of two args of the type in the collection. For example,
+  [:a :a :b :c] becomes [[:a :a] [:b :c]] and [:a :b :c] becomes [[:a]
+  [:b :c]]."
+  [pred coll]
   (loop [l (vector (first coll))
          r (rest coll)]
-    (if (and (not (empty? r)) (= (last l) (first r)))
+    (if (and (not (empty? r)) (not (pred (last l) (first r))))
       (recur (conj l (first r)) (rest r))
       [l (vec r)])))
 
@@ -61,3 +70,4 @@ subordinate or equal to the first entry."
   [s subordinate? siblings?]
   (letfn [(fatn [coll res prev]
             (when-let [a (first coll)]))]))
+
