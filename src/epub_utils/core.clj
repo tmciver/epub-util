@@ -54,13 +54,6 @@ subordinate to the first entry."
     (when descendents
       (filter #(directly-subordinate-heading? heading %) descendents))))
 
-(defn get-most-superior-heading
-  "Walks through coll and returns an integer representing the rank of the most
-  superior heading found. E.g. if :h1 is most superior, 1 is returned; if :h2
-  is, then 2 is returned."
-  [coll]
-  )
-
 (defn get-top-level-sibling-headings
   "Returns a collection of headings that are the highest rank found in coll or
 an empty collection if none."
@@ -90,19 +83,3 @@ an empty collection if none."
                          :content (:content h)}]}
              {:tag :content
               :attrs {:src ""}}]})
-
-(defn headings-to-navpoints
-  "Converts a seq of enlive html headings and returns a nested map structure
-  of navpoint maps."
-  [hs]
-  )
-
-(defn fatten
-  "Opposite of flatten. ;)  Takes a flat seq and constructs a nested vector such
-  that a member 'b' of the seq is a child of the preceding member 'a' if
-  subordinate? returns non-nil and consecutive members are considered siblings
-  if siblings? returns non-nil."
-  [s subordinate? siblings?]
-  (letfn [(fatn [coll res prev]
-            (when-let [a (first coll)]))]))
-
