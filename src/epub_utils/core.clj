@@ -19,7 +19,7 @@
 (defn subordinate-or-equal?
   "Returns true if the second entry represents a heading that is directly
 subordinate or equal to the first entry."
-  [h1 h2]
+  [{h1 :tag} {h2 :tag}]
   (let [h1val (heading-to-val h1)
         h2val (heading-to-val h2)]
     (or (= (- h2val h1val) 1)
@@ -28,10 +28,31 @@ subordinate or equal to the first entry."
 (defn subordinate-heading?
   "Returns true if the second entry represents a heading that is subordinate to
 the first entry."
-  [h1 h2]
+  [{h1 :tag} {h2 :tag}]
   (let [h1val (heading-to-val h1)
         h2val (heading-to-val h2)]
     (< h1val h2val)))
+
+(defn directly-subordinate-heading?
+  "Returns true if the second entry represents a heading that is directly
+subordinate to the first entry."
+  [{h1 :tag} {h2 :tag}]
+  (let [h1val (heading-to-val h1)
+        h2val (heading-to-val h2)]
+    (= (- h2val h1val) 1)))
+
+(defn direct-child-headings
+  "Returns the direct child headings of the given heading. The heading and its
+  children must be found in coll.  Child headings are considered to bo those
+  headings immediately following heading and before a heading of equal or
+  greater rank to heading and which are directly subordinate to heading."
+  [heading coll]
+  (let [descendents (->> coll
+                         (drop-while #(not= heading %))
+                         rest
+                         (take-while #(subordinate-heading? heading %)))]
+    (when descendents
+      (filter #(directly-subordinate-heading? heading %) descendents))))
 
 (defn split-when
   "Splits the given collection at the point at which pred becomes false. pred
