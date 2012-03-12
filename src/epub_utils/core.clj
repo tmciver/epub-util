@@ -16,15 +16,6 @@
        str
        Integer.))
 
-(defn subordinate-or-equal?
-  "Returns true if the second entry represents a heading that is directly
-subordinate or equal to the first entry."
-  [{h1 :tag} {h2 :tag}]
-  (let [h1val (heading-to-val h1)
-        h2val (heading-to-val h2)]
-    (or (= (- h2val h1val) 1)
-        (= h2val h1val))))
-
 (defn subordinate-heading?
   "Returns true if the second entry represents a heading that is subordinate to
 the first entry."

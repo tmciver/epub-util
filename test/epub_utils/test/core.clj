@@ -2,13 +2,6 @@
   (:use [epub-utils.core]
         [clojure.test]))
 
-(deftest test-subordinate-or-equal?
-  (are [h1 h2 res] (= (subordinate-or-equal? h1 h2) res)
-       {:tag :h1} {:tag :h2} true
-       {:tag :h2} {:tag :h1} false
-       {:tag :h1} {:tag :h3} false
-       {:tag :h2} {:tag :h2} true))
-
 (deftest test-subordinate-heading?
   (are [h1 h2 res] (= (subordinate-heading? h1 h2) res)
        {:tag :h1} {:tag :h2} true
