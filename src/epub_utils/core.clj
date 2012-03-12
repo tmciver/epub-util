@@ -54,6 +54,20 @@ subordinate to the first entry."
     (when descendents
       (filter #(directly-subordinate-heading? heading %) descendents))))
 
+(defn get-most-superior-heading
+  "Walks through coll and returns an integer representing the rank of the most
+  superior heading found. E.g. if :h1 is most superior, 1 is returned; if :h2
+  is, then 2 is returned."
+  [coll]
+  )
+
+(defn get-top-level-sibling-headings
+  "Returns a collection of headings that are the highest rank found in coll or
+an empty collection if none."
+  [coll]
+  (let [hirank (apply min (map #(heading-to-val (:tag %)) coll))]
+    (filter #(= hirank (heading-to-val (:tag %))) coll)))
+
 (defn split-when
   "Splits the given collection at the point at which pred becomes false. pred
   must be a function of two args of the type in the collection. For example,

@@ -24,6 +24,11 @@
        {:tag :h1} {:tag :h3} false
        {:tag :h2} {:tag :h2} false))
 
+(deftest test-get-top-level-sibling-headings
+  (are [headings res] (= (get-top-level-sibling-headings headings) res)
+       [{:tag :h1} {:tag :h2} {:tag :h3} {:tag :h2} {:tag :h1} {:tag :h2}]
+       [{:tag :h1} {:tag :h1}]))
+
 (deftest test-direct-child-headings
   (are [heading headings res] (= (direct-child-headings heading headings) res)
        {:tag :h2,
