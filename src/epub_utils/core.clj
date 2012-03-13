@@ -52,6 +52,18 @@ an empty collection if none."
   (let [hirank (apply min (map #(heading-to-val (:tag %)) coll))]
     (filter #(= hirank (heading-to-val (:tag %))) coll)))
 
+(defn nest-headings
+  "Takes a seq of enlive heading maps and nests each heading's children using
+  keyword :children."
+  [headings]
+  (let [tls (get-top-level-sibling-headings headings)
+        nest (fn nest [heading]
+               (let [children (direct-child-headings heading headings)]
+                 (if (empty? children)
+                   heading
+                   (assoc heading :children (map nest children)))))]
+    (map nest tls)))
+
 (defn split-when
   "Splits the given collection at the point at which pred becomes false. pred
   must be a function of two args of the type in the collection. For example,
