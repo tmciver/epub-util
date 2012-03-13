@@ -108,7 +108,3 @@
           {:tag :h3,
            :attrs {:id "section-4.4", :class "calibre1"},
            :content ["4.4 Other causes of complexity"]}]}]))
-
-(deftest test-split-when
-  (are [pred coll res] (= (split-when pred coll) res)
-       not= [1 1 1 2 3] [[1 1 1] [2 3]]))

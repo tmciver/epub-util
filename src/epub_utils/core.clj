@@ -64,18 +64,6 @@ an empty collection if none."
                    (assoc heading :children (map nest children)))))]
     (map nest tls)))
 
-(defn split-when
-  "Splits the given collection at the point at which pred becomes false. pred
-  must be a function of two args of the type in the collection. For example,
-  [:a :a :b :c] becomes [[:a :a] [:b :c]] and [:a :b :c] becomes [[:a]
-  [:b :c]]."
-  [pred coll]
-  (loop [l (vector (first coll))
-         r (rest coll)]
-    (if (and (not (empty? r)) (not (pred (last l) (first r))))
-      (recur (conj l (first r)) (rest r))
-      [l (vec r)])))
-
 (defn heading-to-navpoint
   "Converts a map representing an Enlive heading tag to a map representing an
   Enlive ePUB TOC NavPoint tag."
