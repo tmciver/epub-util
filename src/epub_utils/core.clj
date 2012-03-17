@@ -3,9 +3,6 @@
             [hiccup.core :as hiccup])
   (:import java.io.File))
 
-(defn fetch-url [url]
-  (enlive/html-resource (java.net.URL. url)))
-
 (defn headings [page]
   (enlive/select page #{[:h1] [:h2] [:h3] [:h4] [:h5]}))
 
