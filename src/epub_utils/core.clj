@@ -1,6 +1,7 @@
 (ns epub-utils.core
   (:require [net.cgrand.enlive-html :as enlive]
-            [hiccup.core :as hiccup]))
+            [hiccup.core :as hiccup])
+  (:import java.io.File))
 
 (defn fetch-url [url]
   (enlive/html-resource (java.net.URL. url)))
@@ -65,9 +66,9 @@ an empty collection if none."
                    (assoc heading :children (map nest children)))))]
     (map nest tls)))
 
-(defn headings-to-navmap
-  "Converts a seq of nested headings to an enlive data structure representing a
-  navmap."
+(defn headings-to-navpoints
+  "Converts a collection of nested headings to a collection of hiccup-style
+  vectors representing navpoints."
   [headings]
   (let [navpoint (fn navpoint
                    [heading]
@@ -78,5 +79,13 @@ an empty collection if none."
                       [:content {:src ""}
                        (when-let [children (:children heading)]
                          (vec (map navpoint children)))]]))]
-    (hiccup/html [:navMap (map navpoint headings)])))
+    (map navpoint headings)))
 
+(defn extract-navpoints
+  "Takes a path to a file as a string and returns a collection of hiccup-style
+  vectors representing navPoints."
+  [filepath]
+  (let [res (enlive/html-resource (File. filepath))
+        hs (headings res)
+        nested-hs (nest-headings hs)]
+    (headings-to-navpoints nested-hs)))
