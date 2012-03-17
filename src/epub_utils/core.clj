@@ -64,13 +64,17 @@ an empty collection if none."
                    (assoc heading :children (map nest children)))))]
     (map nest tls)))
 
-(defn heading-to-navpoint
-  "Converts a map representing an Enlive heading tag to a map representing an
-  Enlive ePUB TOC NavPoint tag."
-  [h]
-  {:tag :navPoint
-   :content [{:tag :navLabel
-              :content [{:tag :text
-                         :content (:content h)}]}
-             {:tag :content
-              :attrs {:src ""}}]})
+(defn headings-to-navmap
+  "Converts a seq of nested headings to an enlive data structure representing a
+  navmap."
+  [headings]
+  (let [navpoint (fn navpoint
+                   [heading]
+                   [:navPoint
+                    [:navLabel
+                     [:text (:content heading)]]
+                    [:content {:src ""}
+                     (when-let [children (:children heading)]
+                                (vec (map navpoint children)))]])]
+    [:navMap (map navpoint headings)]))
+
