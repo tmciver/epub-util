@@ -1,4 +1,4 @@
-(ns epub-utils.core
+(ns epub-utils.navmap
   (:require [net.cgrand.enlive-html :as enlive]
             [hiccup.core :as hiccup])
   (:import java.io.File))

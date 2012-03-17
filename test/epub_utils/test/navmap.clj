@@ -1,5 +1,5 @@
-(ns epub-utils.test.core
-  (:use [epub-utils.core]
+(ns epub-utils.test.navmap
+  (:use [epub-utils.navmap]
         [clojure.test]))
 
 (deftest test-subordinate-heading?
