@@ -1,11 +1,12 @@
 (ns epub-utils.core
-  (:require [net.cgrand.enlive-html :as html]))
+  (:require [net.cgrand.enlive-html :as enlive]
+            [hiccup.core :as hiccup]))
 
 (defn fetch-url [url]
-  (html/html-resource (java.net.URL. url)))
+  (enlive/html-resource (java.net.URL. url)))
 
 (defn headings [page]
-  (html/select page #{[:h1] [:h2] [:h3] [:h4] [:h5]}))
+  (enlive/select page #{[:h1] [:h2] [:h3] [:h4] [:h5]}))
 
 (defn- heading-to-val
   "Returns a value corresponding to the heading ordinal, e.g. :h2 -> 2"
@@ -77,5 +78,5 @@ an empty collection if none."
                       [:content {:src ""}
                        (when-let [children (:children heading)]
                          (vec (map navpoint children)))]]))]
-    [:navMap (map navpoint headings)]))
+    (hiccup/html [:navMap (map navpoint headings)])))
 
