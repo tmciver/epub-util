@@ -70,11 +70,12 @@ an empty collection if none."
   [headings]
   (let [navpoint (fn navpoint
                    [heading]
-                   [:navPoint
-                    [:navLabel
-                     [:text (:content heading)]]
-                    [:content {:src ""}
-                     (when-let [children (:children heading)]
-                                (vec (map navpoint children)))]])]
+                   (let [htext (.replaceAll (first (:content heading)) "\\s+" " ")]
+                     [:navPoint
+                      [:navLabel
+                       [:text htext]]
+                      [:content {:src ""}
+                       (when-let [children (:children heading)]
+                         (vec (map navpoint children)))]]))]
     [:navMap (map navpoint headings)]))
 
