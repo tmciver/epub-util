@@ -4,6 +4,8 @@
   (:import java.io.File))
 
 (defn headings [page]
+  "Takes a string of html as an argument and returns a collection of enlive maps
+representing html headings."
   (enlive/select page #{[:h1] [:h2] [:h3] [:h4] [:h5]}))
 
 (defn- heading-to-val
@@ -16,16 +18,20 @@
        Integer.))
 
 (defn subordinate-heading?
-  "Returns true if the second entry represents a heading that is subordinate to
-the first entry."
+  "Returns true if the second argument represents a heading that is subordinate
+to the first argument. Arguments should be maps that have a :tag key whose value
+is a keyword of the form :hn where n is an integer. These keywords represent
+html heading tags."
   [{h1 :tag} {h2 :tag}]
   (let [h1val (heading-to-val h1)
         h2val (heading-to-val h2)]
     (< h1val h2val)))
 
 (defn directly-subordinate-heading?
-  "Returns true if the second entry represents a heading that is directly
-subordinate to the first entry."
+  "Returns true if the second argument represents a heading that is directly
+subordinate to the first argument. Arguments should be maps that have a :tag key
+whose value is a keyword of the form :hn where n is an integer. These keywords
+represent html heading tags."
   [{h1 :tag} {h2 :tag}]
   (let [h1val (heading-to-val h1)
         h2val (heading-to-val h2)]
@@ -33,7 +39,7 @@ subordinate to the first entry."
 
 (defn direct-child-headings
   "Returns the direct child headings of the given heading. The heading and its
-  children must be found in coll.  Child headings are considered to bo those
+  children must be found in coll.  Child headings are considered to be those
   headings immediately following heading and before a heading of equal or
   greater rank to heading and which are directly subordinate to heading."
   [heading coll]
@@ -52,8 +58,8 @@ an empty collection if none."
     (filter #(= hirank (heading-to-val (:tag %))) coll)))
 
 (defn nest-headings
-  "Takes a seq of enlive heading maps and nests each heading's children using
-  keyword :children."
+  "Takes a collection of enlive heading maps and nests each heading's children
+  using keyword :children."
   [headings]
   (let [tls (get-top-level-sibling-headings headings)
         nest (fn nest [heading]
