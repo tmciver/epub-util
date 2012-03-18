@@ -71,15 +71,17 @@ an empty collection if none."
 
 (defn headings-to-navpoints
   "Converts a collection of nested headings to a collection of hiccup-style
-  vectors representing navpoints."
-  [headings]
+  vectors representing navpoints. filename is the name of the file used to
+  generate the headings. This is needed to set the src attribute of the
+  navpoints content tag."
+  [headings filename]
   (let [navpoint (fn navpoint
                    [heading]
                    (let [htext (.replaceAll (first (:content heading)) "\\s+" " ")]
                      [:navPoint
                       [:navLabel
                        [:text htext]]
-                      [:content {:src ""}
+                      [:content {:src (str filename "#" ((comp :id :attrs) heading))}
                        (when-let [children (:children heading)]
                          (vec (map navpoint children)))]]))]
     (map navpoint headings)))
@@ -88,10 +90,12 @@ an empty collection if none."
   "Takes a path to a file as a string and returns a collection of hiccup-style
   vectors representing navPoints."
   [filepath]
-  (let [res (enlive/html-resource (File. filepath))
+  (let [file (File. filepath)
+        filename (.getName file)
+        res (enlive/html-resource file)
         hs (headings res)
         nested-hs (nest-headings hs)]
-    (headings-to-navpoints nested-hs)))
+    (headings-to-navpoints nested-hs filename)))
 
 (defn create-navmap
   "Takes a collection of strings representing paths to html files and returns a
