@@ -86,3 +86,9 @@ an empty collection if none."
         hs (headings res)
         nested-hs (nest-headings hs)]
     (headings-to-navpoints nested-hs)))
+
+(defn create-navmap
+  "Takes a collection of strings representing paths to html files and returns a
+  hiccup-style vector representing a navmap."
+  [filepaths]
+  [:navmap (mapcat extract-navpoints filepaths)])
