@@ -1,7 +1,8 @@
 (ns epub-utils.navmap
   (:require [net.cgrand.enlive-html :as enlive]
             [hiccup.core :as hiccup])
-  (:import java.io.File))
+  (:import [java.io File StringWriter StringReader]
+           [org.w3c.tidy Tidy]))
 
 (defn headings [page]
   "Takes a string of html as an argument and returns a collection of enlive maps
@@ -83,7 +84,7 @@ an empty collection if none."
                        [:text htext]]
                       [:content {:src (str filename "#" ((comp :id :attrs) heading))}
                        (when-let [children (:children heading)]
-                         (vec (map navpoint children)))]]))]
+                         (map navpoint children))]]))]
     (map navpoint headings)))
 
 (defn extract-navpoints
@@ -102,3 +103,19 @@ an empty collection if none."
   hiccup-style vector representing a navmap."
   [filepaths]
   [:navmap (mapcat extract-navpoints filepaths)])
+
+(defn tidy
+  "Takes a string of html and 'tidies' it up using JTidy. Returns the tidied
+  html."
+  [htmlstr]
+  (let [tide (doto (Tidy.)
+               (.setSmartIndent true)
+;               (.setXmlOut true)
+;               (.setXHTML false)
+;               (.setTrimEmptyElements true)
+               (.setShowWarnings true)
+               (.setQuiet false))
+        swrtr (StringWriter.)
+        srdr (StringReader. htmlstr)]
+    (.parse tide srdr swrtr)
+    (str swrtr)))
