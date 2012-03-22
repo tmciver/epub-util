@@ -4,10 +4,16 @@
   (:import [java.io File StringWriter StringReader]
            [org.w3c.tidy Tidy]))
 
-(defn headings [page]
-  "Takes a string of html as an argument and returns a collection of enlive maps
-representing html headings."
-  (enlive/select page #{[:h1] [:h2] [:h3] [:h4] [:h5]}))
+(defn headings
+  "Takes one or more strings representing paths to files from which all html
+  headings will be returned in the order in which they are encountered."
+  [& filepaths]
+  (let [htags #{[:h1] [:h2] [:h3] [:h4] [:h5] [:h6]}]
+    (->> filepaths
+         (map #(File. %))
+         (map #(enlive/html-resource %))
+         (map #(enlive/select % htags))
+         (apply concat))))
 
 (defn- heading-to-val
   "Returns a value corresponding to the heading ordinal, e.g. :h2 -> 2"
@@ -70,8 +76,8 @@ an empty collection if none."
                    (assoc heading :children (map nest children)))))]
     (map nest tls)))
 
-(defn headings-to-navpoints
-  "Converts a collection of nested headings to a collection of hiccup-style
+(defn headings-to-navmap
+  "Converts a collection of nested headings to a hiccup-style
   vectors representing navpoints. filename is the name of the file used to
   generate the headings. This is needed to set the src attribute of the
   navpoints content tag."
@@ -85,24 +91,30 @@ an empty collection if none."
                       [:content {:src (str filename "#" ((comp :id :attrs) heading))}
                        (when-let [children (:children heading)]
                          (map navpoint children))]]))]
-    (map navpoint headings)))
+    [:navMap (map navpoint headings)]))
 
-(defn extract-navpoints
-  "Takes a path to a file as a string and returns a collection of hiccup-style
-  vectors representing navPoints."
-  [filepath]
-  (let [file (File. filepath)
-        filename (.getName file)
-        res (enlive/html-resource file)
-        hs (headings res)
-        nested-hs (nest-headings hs)]
-    (headings-to-navpoints nested-hs filename)))
+;; (defn extract-navpoints
+;;   "Takes a path to a file as a string and returns a collection of hiccup-style
+;;   vectors representing navPoints."
+;;   [filepath]
+;;   (let [file (File. filepath)
+;;         filename (.getName file)
+;;         res (enlive/html-resource file)
+;;         hs (headings res)
+;;         nested-hs (nest-headings hs)]
+;;     (headings-to-navpoints nested-hs filename)))
 
-(defn create-navmap
-  "Takes a collection of strings representing paths to html files and returns a
-  hiccup-style vector representing a navmap."
-  [filepaths]
-  [:navmap (mapcat extract-navpoints filepaths)])
+;; (defn add-playorder
+;;   "Takes a collection of nested maps representing enlive-style html heading tags
+;;   (as from nest-headings) and returns the nested map with :playorder key
+;;   added. :playorder values are integers starting at 1 for the first heading and
+;;   incrementing in a depth-first manner to a depth of depth or for all of the
+;;   headings for the single-argument version."
+;;   ([nheadings]
+;;      (add-playorder nheadings Long/MAX_VALUE))
+;;   ([nheadings depth]
+;;      (let [walk (fn walk [heading depth]
+;;                   )])))
 
 (defn tidy
   "Takes a string of html and 'tidies' it up using JTidy. Returns the tidied
@@ -110,9 +122,9 @@ an empty collection if none."
   [htmlstr]
   (let [tide (doto (Tidy.)
                (.setSmartIndent true)
-;               (.setXmlOut true)
-;               (.setXHTML false)
-;               (.setTrimEmptyElements true)
+                                        ;               (.setXmlOut true)
+                                        ;               (.setXHTML false)
+                                        ;               (.setTrimEmptyElements true)
                (.setShowWarnings true)
                (.setQuiet false))
         swrtr (StringWriter.)
