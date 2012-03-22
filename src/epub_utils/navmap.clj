@@ -99,9 +99,9 @@ an empty collection if none."
                        :id (str "navpoint-id-" ((comp :id :attrs) heading))}
                       [:navLabel
                        [:text htext]]
-                      [:content {:src (str (:src-file heading) "#" ((comp :id :attrs) heading))}
-                       (when-let [children (:children heading)]
-                         (map navpoint children))]]))]
+                      [:content {:src (str (:src-file heading) "#" ((comp :id :attrs) heading))}]
+                      (when-let [children (:children heading)]
+                        (map navpoint children))]))]
     [:navMap (map navpoint headings)]))
 
 (defn tidy
