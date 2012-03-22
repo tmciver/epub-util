@@ -6,14 +6,19 @@
 
 (defn headings
   "Takes one or more strings representing paths to files from which all html
-  headings will be returned in the order in which they are encountered."
+  headings will be returned in the order in which they are encountered. Key
+  :src-file is added to the enlive tag map whose value is the source file's
+  name (to be used downstream)."
   [& filepaths]
-  (let [htags #{[:h1] [:h2] [:h3] [:h4] [:h5] [:h6]}]
-    (->> filepaths
-         (map #(File. %))
-         (map #(enlive/html-resource %))
-         (map #(enlive/select % htags))
-         (apply concat))))
+  (let [htags #{[:h1] [:h2] [:h3] [:h4] [:h5] [:h6]}
+        files (map #(File. %) filepaths)
+        hs (->> files
+                (map #(enlive/html-resource %))
+                (map #(enlive/select % htags)))
+        add-src-file (fn [headings file]
+                       (map #(assoc % :src-file (.getName file)) headings))
+        hs-w-src (map add-src-file hs files)]
+    (apply concat hs-w-src)))
 
 (defn- heading-to-val
   "Returns a value corresponding to the heading ordinal, e.g. :h2 -> 2"
@@ -81,28 +86,17 @@ an empty collection if none."
   vectors representing navpoints. filename is the name of the file used to
   generate the headings. This is needed to set the src attribute of the
   navpoints content tag."
-  [headings filename]
+  [headings]
   (let [navpoint (fn navpoint
                    [heading]
                    (let [htext (.replaceAll (first (:content heading)) "\\s+" " ")]
                      [:navPoint
                       [:navLabel
                        [:text htext]]
-                      [:content {:src (str filename "#" ((comp :id :attrs) heading))}
+                      [:content {:src (str (:src-file heading) "#" ((comp :id :attrs) heading))}
                        (when-let [children (:children heading)]
                          (map navpoint children))]]))]
     [:navMap (map navpoint headings)]))
-
-;; (defn extract-navpoints
-;;   "Takes a path to a file as a string and returns a collection of hiccup-style
-;;   vectors representing navPoints."
-;;   [filepath]
-;;   (let [file (File. filepath)
-;;         filename (.getName file)
-;;         res (enlive/html-resource file)
-;;         hs (headings res)
-;;         nested-hs (nest-headings hs)]
-;;     (headings-to-navpoints nested-hs filename)))
 
 ;; (defn add-playorder
 ;;   "Takes a collection of nested maps representing enlive-style html heading tags
