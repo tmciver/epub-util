@@ -17,8 +17,12 @@
                 (map #(enlive/select % htags)))
         add-src-file (fn [headings file]
                        (map #(assoc % :src-file (.getName file)) headings))
-        hs-w-src (map add-src-file hs files)]
-    (apply concat hs-w-src)))
+        hs-w-src (map add-src-file hs files)
+        add-po (fn [playorder heading]
+                 (assoc heading :playorder playorder))]
+    (->> hs-w-src
+         (apply concat)
+         (map add-po (range)))))
 
 (defn- heading-to-val
   "Returns a value corresponding to the heading ordinal, e.g. :h2 -> 2"
@@ -91,24 +95,14 @@ an empty collection if none."
                    [heading]
                    (let [htext (.replaceAll (first (:content heading)) "\\s+" " ")]
                      [:navPoint
+                      {:playOrder (:playorder heading)
+                       :id (str "navpoint-id-" ((comp :id :attrs) heading))}
                       [:navLabel
                        [:text htext]]
                       [:content {:src (str (:src-file heading) "#" ((comp :id :attrs) heading))}
                        (when-let [children (:children heading)]
                          (map navpoint children))]]))]
     [:navMap (map navpoint headings)]))
-
-;; (defn add-playorder
-;;   "Takes a collection of nested maps representing enlive-style html heading tags
-;;   (as from nest-headings) and returns the nested map with :playorder key
-;;   added. :playorder values are integers starting at 1 for the first heading and
-;;   incrementing in a depth-first manner to a depth of depth or for all of the
-;;   headings for the single-argument version."
-;;   ([nheadings]
-;;      (add-playorder nheadings Long/MAX_VALUE))
-;;   ([nheadings depth]
-;;      (let [walk (fn walk [heading depth]
-;;                   )])))
 
 (defn tidy
   "Takes a string of html and 'tidies' it up using JTidy. Returns the tidied
