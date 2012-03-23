@@ -119,3 +119,12 @@ an empty collection if none."
         srdr (StringReader. htmlstr)]
     (.parse tide srdr swrtr)
     (str swrtr)))
+
+(defn navmap
+  "Returns a string of XML representing the navmap portion of en ePUB toc.ncx
+  table of contents files given one or more paths to html files."
+  [& filepaths]
+  (->> (apply headings filepaths)
+       nest-headings
+       headings-to-navmap
+       hiccup/html))
